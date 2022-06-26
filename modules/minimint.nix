@@ -18,16 +18,20 @@ let
       clightning = {
         enable = mkOption {
           type = types.bool;
-          default = false;
+          default = true;
           description = "Enable the clightning node interface.";
         };  
       };
-    };  
-  }
+    }; 
+
+  };
+    inherit (config.services)
+    clightning
+    clightning-rest;
 in {
   inherit options;
 
-  config = mkIf cfg.enable {
-    systemd.services.clightning = {};
-  };
+  # config = mkIf cfg.enable {
+    # systemd.services.clightning = {};
+  # };
 }
