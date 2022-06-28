@@ -157,7 +157,7 @@
   # services.liquidd.enable = true;
   #
   # Liquid can be controlled with command 'elements-cli'.
-
+services.minimint.enable = true;
   ### Hardware wallets
   # Enable the following to allow using hardware wallets.
   # See https://github.com/bitcoin-core/HWI for more information.
