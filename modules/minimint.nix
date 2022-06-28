@@ -23,11 +23,11 @@ let
         };  
       };
     };  
-  }
+  };
 in {
   inherit options;
 
-  config = mkIf cfg.enable {
-    systemd.services.clightning = {};
-  };
+  # config = mkIf cfg.enable {
+  #   systemd.services.clightning = {};
+  # };
 }
