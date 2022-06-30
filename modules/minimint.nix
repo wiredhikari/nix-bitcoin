@@ -18,7 +18,7 @@ let
       clightning = {
         enable = mkOption {
           type = types.bool;
-          default = false;
+          default = true;
           description = "Enable the clightning node interface.";
         };  
       };
@@ -26,8 +26,8 @@ let
   };
 in {
   inherit options;
-
-  # config = mkIf cfg.enable {
-  #   systemd.services.clightning = {};
-  # };
+  config = mkIf cfg.enable {
+    services.lnd.enable = true;
+  }
+  
 }
