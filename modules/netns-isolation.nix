@@ -293,6 +293,9 @@ in {
       clightning-rest = {
         id = 30;
       };
+      minimint = {
+        id = 31;
+      };
     };
 
     services.bitcoind = {
@@ -350,6 +353,8 @@ in {
     services.rtl.address = netns.rtl.address;
 
     services.clightning-rest.address = netns.clightning-rest.address;
+
+    services.minimint.address = netns.minimint.address;
   }
   ]);
 }
