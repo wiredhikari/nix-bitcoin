@@ -3,16 +3,34 @@
 with lib;
 let
   options.services.minimint = {
-    enable = mkEnableOption "Minimint, an implementation of a federated Chaumian bank";
+      enable = mkOption {
+      type = types.bool;
+      default = false;
+      description = ''
+        Enable Minimint,is a federated Chaumian e-cash mint backed 
+        by bitcoin with deposits and withdrawals that can occur on-chain
+        or via Lightning.
+      '';
+    }; 
     address = mkOption {
       type = types.str;
       default = "127.0.0.1";
-      description = "HTTP server address.";
+      description = "Address to listen for RPC connections.";
     };
     port = mkOption {
       type = types.port;
-      default = 3000;
-      description = "HTTP server port.";
+      default = 5001;
+      description = "Port to listen for RPC connections.";
+    };
+    user = mkOption {
+      type = types.str;
+      default = "minimint";
+      description = "The user as which to run minimint.";
+    };
+    group = mkOption {
+      type = types.str;
+      default = cfg.user;
+      description = "The group as which to run minimint.";
     };
     nodes = {
       clightning = {
@@ -24,10 +42,43 @@ let
       };
     };  
   };
+
+  cfg = config.services.minimint;
+  nbLib = config.nix-bitcoin.lib;
+  secretsDir = config.nix-bitcoin.secretsDir;
+  bitcoind = config.services.bitcoind;
+
 in {
   inherit options;
   config = mkIf cfg.enable {
+    services.bitcoind = {
+      enable = true;
+      txindex = true;
+    };
     services.lnd.enable = true;
-  }
-  
+
+    systemd.services.minimint = {
+      wantedBy = [ "multi-user.target" ];
+      requires = [ "bitcoind.service" ];
+      after = [ "bitcoind.service" ];
+      preStart = ''
+      {
+        #todo
+      }
+      '';
+      serviceConfig = nbLib.defaultHardening // {
+      User = cfg.user;
+      Group = cfg.group;
+      Restart = "on-failure";
+      RestartSec = "10s";
+      ReadWritePaths = [ cfg.dataDir ];
+      } // nbLib.allowedIPAddresses cfg.tor.enforce;
+    };
+    users.users.${cfg.user} = {
+      isSystemUser = true;
+      group = cfg.group;
+      extraGroups = [ "bitcoinrpc-public" ];
+    };
+    users.groups.${cfg.group} = {};
+  };
 }
