@@ -71,8 +71,7 @@ in {
       Group = cfg.group;
       Restart = "on-failure";
       RestartSec = "10s";
-      ReadWritePaths = [ cfg.dataDir ];
-      } // nbLib.allowedIPAddresses cfg.tor.enforce;
+      };
     };
     users.users.${cfg.user} = {
       isSystemUser = true;

@@ -34,7 +34,7 @@ in {
     # but we restrict them to Tor just to be safe.
     #
     electrs = defaultEnforceTor;
-    minimint = defaultEnforceTor;
+    # minimint = defaultEnforceTor;
     nbxplorer = defaultEnforceTor;
     rtl = defaultEnforceTor;
     joinmarket = defaultEnforceTor;
