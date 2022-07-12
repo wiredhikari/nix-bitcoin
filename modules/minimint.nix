@@ -61,11 +61,6 @@ in {
       wantedBy = [ "multi-user.target" ];
       requires = [ "bitcoind.service" ];
       after = [ "bitcoind.service" ];
-      preStart = ''
-      {
-        #todo
-      }
-      '';
       serviceConfig = nbLib.defaultHardening // {
       User = cfg.user;
       Group = cfg.group;
