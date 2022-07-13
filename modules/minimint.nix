@@ -32,6 +32,7 @@ let
       default = cfg.user;
       description = "The group as which to run minimint.";
     };
+    tor.enforce = nbLib.tor.enforce;
     nodes = {
       clightning = {
         enable = mkOption {
@@ -55,7 +56,7 @@ in {
       enable = true;
       txindex = true;
     };
-    services.lnd.enable = true;
+    services.clightning.enable = true;
 
     systemd.services.minimint = {
       wantedBy = [ "multi-user.target" ];
