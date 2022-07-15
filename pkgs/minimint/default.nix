@@ -1,25 +1,25 @@
-{ lib, rustPlatform, fetchFromGitHub, openssl, pkg-config, perl}:
+{ stdenv, lib, rustPlatform, fetchurl, pkgs, fetchFromGitHub, openssl, pkg-config, perl }:
 
 rustPlatform.buildRustPackage rec {
   pname = "minimint";
   version = "master";
 
+  nativeBuildInputs = [ pkg-config perl openssl  ];
+  OPENSSL_DIR = "${pkgs.openssl.dev}";
+  OPENSSL_LIB_DIR = "${pkgs.openssl.out}/lib";  
   checkType = "debug";
   src = builtins.fetchGit {
   url = "https://github.com/fedimint/minimint";
   ref = "master";
   };
-  buildInputs = [
-    openssl
-    pkg-config
-    perl
-  ];
 
-  cargoSha256 =  "sha256-TmdL8rJtO8Y04LeXf8XOJf3AjLEOgiWneCD5JaQSFQc=";
+
+  cargoSha256 =  "sha256-6TFiDFqP888qxWLAlyvofa/NFr+2hU8R0HvdHtqkGeg=";
   meta = with lib; {
     description = "Federated Mint Prototype";
     homepage = "https://github.com/fedimint/minimint";
     license = licenses.mit;
     maintainers = with maintainers; [ wiredhikari ];
   };
+
 }
