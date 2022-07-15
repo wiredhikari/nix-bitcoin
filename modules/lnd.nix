@@ -11,7 +11,7 @@ let
     };
     port = mkOption {
       type = types.port;
-      default = 9739;
+      default = 9735;
       description = "Port to listen for peer connections";
     };
     rpcAddress = mkOption {

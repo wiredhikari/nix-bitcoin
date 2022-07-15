@@ -43,7 +43,7 @@
 
   ### CLIGHTNING
   # Enable clightning, a Lightning Network implementation in C.
-  services.clightning.enable = true;
+  #services.clightning.enable = true;
   #
   # Set this to create an onion service by which clightning can accept incoming connections
   # via Tor.
@@ -162,7 +162,7 @@
   # Enable this module to use Minimint, a federated Chaumian e-cash 
   # mint backed by bitcoin with deposits and withdrawals that can 
   # occur on-chain or via Lightning.
-   services.minimint.enable = true;
+  services.minimint.enable = true;
 
   ### Hardware wallets
   # Enable the following to allow using hardware wallets.

@@ -5,7 +5,7 @@ let
   options.services.minimint = {
       enable = mkOption {
       type = types.bool;
-      default = false;
+      default = true;
       description = ''
         Enable Minimint,is a federated Chaumian e-cash mint backed 
         by bitcoin with deposits and withdrawals that can occur on-chain
@@ -21,6 +21,11 @@ let
       type = types.port;
       default = 5001;
       description = "Port to listen for RPC connections.";
+    };
+    dataDir = mkOption {
+      type = types.path;
+      default = "/var/lib/minimint";
+      description = "The data directory for minimint.";
     };
     user = mkOption {
       type = types.str;
@@ -41,6 +46,7 @@ let
           description = "Enable the clightning node interface.";
         };  
       };
+
     };  
   };
 
@@ -57,12 +63,23 @@ in {
       txindex = true;
     };
     services.clightning.enable = true;
-
     systemd.services.minimint = {
       wantedBy = [ "multi-user.target" ];
       requires = [ "bitcoind.service" ];
       after = [ "bitcoind.service" ];
       serviceConfig = nbLib.defaultHardening // {
+      WorkingDirectory = cfg.dataDir;
+      ExecStart = ''
+          ${config.nix-bitcoin.pkgs.minimint}/bin/minimint \
+          --log-filters=INFO \
+          --network=${bitcoind.makeNetworkName "bitcoin" "regtest"} \
+          --db-dir='${cfg.dataDir}' \
+          --daemon-dir='${bitcoind.dataDir}' \
+          --electrum-rpc-addr=${cfg.address}:${toString cfg.port} \
+          --daemon-rpc-addr=${nbLib.addressWithPort bitcoind.rpc.address bitcoind.rpc.port} \
+          --daemon-p2p-addr=${nbLib.addressWithPort bitcoind.address bitcoind.whitelistedPort} \
+      
+      '';
       User = cfg.user;
       Group = cfg.group;
       Restart = "on-failure";
@@ -77,3 +94,6 @@ in {
     users.groups.${cfg.group} = {};
   };
 }
+##todo
+# prestart and poststart setup
+#
