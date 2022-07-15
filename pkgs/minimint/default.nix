@@ -7,7 +7,6 @@ rustPlatform.buildRustPackage rec {
   nativeBuildInputs = [ pkg-config perl openssl  ];
   OPENSSL_DIR = "${pkgs.openssl.dev}";
   OPENSSL_LIB_DIR = "${pkgs.openssl.out}/lib";  
-  checkType = "debug";
   src = builtins.fetchGit {
   url = "https://github.com/fedimint/minimint";
   ref = "master";
