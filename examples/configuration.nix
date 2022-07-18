@@ -266,7 +266,7 @@
 
   # FIXME: Uncomment this to allow the operator user to run
   # commands as root with `sudo` or `doas`
-  # users.users.operator.extraGroups = [ "wheel" ];
+   users.users.operator.extraGroups = [ "wheel" ];
 
   # FIXME: add packages you need in your system
   environment.systemPackages = with pkgs; [

@@ -3,7 +3,6 @@
 rustPlatform.buildRustPackage rec {
   pname = "minimint";
   version = "master";
-
   nativeBuildInputs = [ pkg-config perl openssl  ];
   OPENSSL_DIR = "${pkgs.openssl.dev}";
   OPENSSL_LIB_DIR = "${pkgs.openssl.out}/lib";  
@@ -11,8 +10,6 @@ rustPlatform.buildRustPackage rec {
   url = "https://github.com/fedimint/minimint";
   ref = "master";
   };
-
-
   cargoSha256 =  "sha256-6TFiDFqP888qxWLAlyvofa/NFr+2hU8R0HvdHtqkGeg=";
   meta = with lib; {
     description = "Federated Mint Prototype";
