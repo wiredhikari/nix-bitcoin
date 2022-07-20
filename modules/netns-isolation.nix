@@ -296,6 +296,9 @@ in {
       minimint = {
         id = 31;
       };
+      fedimint-gateway = {
+        id = 32;
+      };
     };
 
     services.bitcoind = {
