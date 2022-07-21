@@ -22,6 +22,11 @@ let
       default = 5001;
       description = "Port to listen for RPC connections.";
     };
+    extraArgs = mkOption {
+      type = types.separatedString " ";
+      default = "";
+      description = "Extra command line arguments passed to electrs.";
+    };
     dataDir = mkOption {
       type = types.path;
       default = "/var/lib/minimint";
@@ -76,24 +81,16 @@ in {
     ];
     systemd.services.minimint = {
       wantedBy = [ "multi-user.target" ];
-      requires = [ "bitcoind.service" ];
+      requires = [ "bitcoind.service" "fedimint-gateway.service" ];
       after = [ "bitcoind.service" ];
       preStart = ''
         echo "auth = \"${bitcoind.rpc.users.public.name}:$(cat ${secretsDir}/bitcoin-rpcpassword-public)\"" \
           > federation.json
+        mkdir -p /var/lib/minimint/cfg
       '';
       serviceConfig = nbLib.defaultHardening // {
       WorkingDirectory = cfg.dataDir;
-      ExecStart = ''
-          ${nbPkgs.minimint}/configgen       
-          ${nbPkgs.minimint}/build/source/minimint \
-          --log-filters=INFO \
-          --network=${bitcoind.makeNetworkName "bitcoin" "regtest"} \
-          --db-dir='${cfg.dataDir}' \
-          --electrum-rpc-addr=${cfg.address}:${toString cfg.port} \
-          --daemon-rpc-addr=${nbLib.addressWithPort bitcoind.rpc.address bitcoind.rpc.port} \
-          --daemon-p2p-addr=${nbLib.addressWithPort bitcoind.address bitcoind.whitelistedPort} \
-      '';
+      ExecStart = '' ${nbPkgs.minimint}/configgen cfg  500 3 3 3 3'';
       User = cfg.user;
       Group = cfg.group;
       Restart = "on-failure";
