@@ -82,15 +82,31 @@ in {
     systemd.services.minimint = {
       wantedBy = [ "multi-user.target" ];
       requires = [ "bitcoind.service" "fedimint-gateway.service" ];
-      after = [ "bitcoind.service" ];
+      after = [ "bitcoind.service" "fedimint-gateway.service"  ];
       preStart = ''
         echo "auth = \"${bitcoind.rpc.users.public.name}:$(cat ${secretsDir}/bitcoin-rpcpassword-public)\"" \
           > federation.json
-        mkdir -p /var/lib/minimint/cfg
       '';
       serviceConfig = nbLib.defaultHardening // {
       WorkingDirectory = cfg.dataDir;
-      ExecStart = '' ${nbPkgs.minimint}/configgen cfg  500 3 3 3 3'';
+      ExecStart = ''
+       
+        fm_bin=$1
+        fm_cfg=$2
+        btc_rpc_address="127.0.0.1:8333"
+        btc_rpc_user="bitcoin"
+        btc_rpc_pass="bitcoin"
+        fm_tmp_config="$(mktemp -d)/config.json"
+
+        echo "Writing tmp config to $fm_tmp_config"
+        cat $fm_cfg | jq ".wallet.btc_rpc_address=\"$btc_rpc_address\"" \
+        | jq ".wallet.btc_rpc_user=\"$btc_rpc_user\"" \
+        | jq ".wallet.btc_rpc_pass=\"$btc_rpc_pass\"" > $fm_tmp_config
+
+        $fm_bin $fm_tmp_config &
+
+        ${nbPkgs.minimint}/configgen cfg  500 3 3 3 3''
+       ;
       User = cfg.user;
       Group = cfg.group;
       Restart = "on-failure";
