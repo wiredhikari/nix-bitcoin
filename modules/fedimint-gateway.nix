@@ -82,7 +82,9 @@ in {
       serviceConfig = nbLib.defaultHardening // {
       WorkingDirectory = cfg.dataDir;
       ExecStart = ''
-      lightningd --network regtest --bitcoin-rpcuser=bitcoin --bitcoin-rpcpassword=bitcoin --lightning-dir=$FM_LN1_DIR --addr=127.0.0.1:9000 --plugin=$FM_BIN_DIR/ln_gateway --minimint-cfg=$FM_CFG_DIR &
+        FM_LN1_DIR=/var/lib/minimint
+        FM_CFG_DIR=/var/lib/minimint
+        lightningd --network regtest --bitcoin-rpcuser=bitcoin --bitcoin-rpcpassword=bitcoin --lightning-dir=$FM_LN1_DIR --addr=127.0.0.1: --plugin=ln_gateway --minimint-cfg=$FM_CFG_DIR
       '';
       User = cfg.user;
       Group = cfg.group;
