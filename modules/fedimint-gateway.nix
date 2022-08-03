@@ -68,9 +68,6 @@ in {
       txindex = true;
     };
     services.clightning.enable = true;
-    systemd.tmpfiles.rules = [
-      "d '${cfg.dataDir}' 0770 ${cfg.user} ${cfg.group} - -"
-    ];
     systemd.services.fedimint-gateway = {
       wantedBy = [ "multi-user.target" ];
       requires = [ "minimint.service" "clightning.service" ];
@@ -82,9 +79,9 @@ in {
       serviceConfig = nbLib.defaultHardening // {
       WorkingDirectory = cfg.dataDir;
       ExecStart = ''
-        FM_LN1_DIR=/var/lib/minimint
+        FM_LN_DIR=/var/lib/minimint
         FM_CFG_DIR=/var/lib/minimint
-        lightningd --network regtest --bitcoin-rpcuser=bitcoin --bitcoin-rpcpassword=bitcoin --lightning-dir=$FM_LN1_DIR --addr=127.0.0.1: --plugin=ln_gateway --minimint-cfg=$FM_CFG_DIR
+        lightningd --network regtest --bitcoin-rpcuser=bitcoin --bitcoin-rpcpassword=bitcoin --lightning-dir=$FM_LN_DIR --addr=127.0.0.1: --plugin=ln_gateway --minimint-cfg=$FM_CFG_DIR
       '';
       User = cfg.user;
       Group = cfg.group;

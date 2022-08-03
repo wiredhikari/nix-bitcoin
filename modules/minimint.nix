@@ -19,13 +19,13 @@ let
     };
     port = mkOption {
       type = types.port;
-      default = 5001;
+      default = 5000;
       description = "Port to listen for RPC connections.";
     };
     extraArgs = mkOption {
       type = types.separatedString " ";
       default = "";
-      description = "Extra command line arguments passed to electrs.";
+      description = "Extra command line arguments passed to minimint.";
     };
     dataDir = mkOption {
       type = types.path;
@@ -42,16 +42,6 @@ let
       default = cfg.user;
       description = "The group as which to run minimint.";
     };
-    tor.enforce = nbLib.tor.enforce;
-    nodes = {
-      clightning = {
-        enable = mkOption {
-          type = types.bool;
-          default = true;
-          description = "Enable the clightning node interface.";
-        };  
-      };
-    };  
     package = mkOption {
       type = types.package;
       default = config.nix-bitcoin.pkgs.minimint;
@@ -75,10 +65,6 @@ in {
       enable = true;
       txindex = true;
     };
-    services.clightning.enable = true;
-    systemd.tmpfiles.rules = [
-      "d '${cfg.dataDir}' 0770 ${cfg.user} ${cfg.group} - -"
-    ];
     systemd.services.minimint = {
       wantedBy = [ "multi-user.target" ];
       requires = [ "bitcoind.service" "fedimint-gateway.service" ];
@@ -93,6 +79,7 @@ in {
        
         fm_bin=$1
         fm_cfg=$2
+
         btc_rpc_address="127.0.0.1:8333"
         btc_rpc_user="bitcoin"
         btc_rpc_pass="bitcoin"
