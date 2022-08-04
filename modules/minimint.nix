@@ -3,14 +3,14 @@
 with lib;
 let
   options.services.minimint = {
-      enable = mkOption {
-      type = types.bool;
-      default = true;
-      description = ''
-        Enable Minimint,is a federated Chaumian e-cash mint backed 
-        by bitcoin with deposits and withdrawals that can occur on-chain
-        or via Lightning.
-      '';
+    enable = mkOption {
+    type = types.bool;
+    default = true;
+    description = ''
+      Enable Minimint,is a federated Chaumian e-cash mint backed 
+      by bitcoin with deposits and withdrawals that can occur on-chain
+      or via Lightning.
+    '';
     }; 
     address = mkOption {
       type = types.str;
@@ -59,11 +59,13 @@ let
 
 in {
   inherit options;
+
   config = mkIf cfg.enable {
     environment.systemPackages = [ cfg.package ];
     services.bitcoind = {
       enable = true;
       txindex = true;
+      regtest = true;
     };
     systemd.services.minimint = {
       wantedBy = [ "multi-user.target" ];
@@ -76,10 +78,9 @@ in {
       serviceConfig = nbLib.defaultHardening // {
       WorkingDirectory = cfg.dataDir;
       ExecStart = ''
-       
-        fm_bin=$1
-        fm_cfg=$2
-
+        fm_cfg=/var/lib/minimint
+        ${config.nix-bitcoin.pkgs.minimint}/bin/configgen $fm_cfg 1 4000 5000 1 10 100 1000 10000 100000 1000000
+        ${config.nix-bitcoin.pkgs.minimint}/bin/mint-client-cli $fm_cfg &
         btc_rpc_address="127.0.0.1:8333"
         btc_rpc_user="bitcoin"
         btc_rpc_pass="bitcoin"
@@ -91,8 +92,8 @@ in {
         | jq ".wallet.btc_rpc_pass=\"$btc_rpc_pass\"" > $fm_tmp_config
 
         $fm_bin $fm_tmp_config &
+        ''
 
-        ${nbPkgs.minimint}/configgen cfg  500 3 3 3 3''
        ;
       User = cfg.user;
       Group = cfg.group;
