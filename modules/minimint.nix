@@ -67,6 +67,9 @@ in {
       txindex = true;
       regtest = true;
     };
+    systemd.tmpfiles.rules = [
+      "d '${cfg.dataDir}' 0770 ${cfg.user} ${cfg.group} - -"
+    ]; 
     systemd.services.minimint = {
       wantedBy = [ "multi-user.target" ];
       requires = [ "bitcoind.service" "fedimint-gateway.service" ];
