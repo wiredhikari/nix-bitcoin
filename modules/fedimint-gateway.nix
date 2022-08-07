@@ -22,7 +22,7 @@ let
     };
     dataDir = mkOption {
       type = types.path;
-      default = "/var/lib/fedimint-gateway";
+      default = "/var/lib/minimint";
       description = "The data directory for fedimint-gateway.";
     };
     user = mkOption {
@@ -68,20 +68,25 @@ in {
       txindex = true;
     };
     services.clightning.enable = true;
+  
     systemd.services.fedimint-gateway = {
-      wantedBy = [ "multi-user.target" ];
-      requires = [ "minimint.service" "clightning.service" ];
-      after = [ "minimint.service" "clightning.service" ];
+      wantedBy = [ "minimint.service" "multi-user.target" ];
+      requires = [ "clightning.service" ];
+      after = [ "clightning.service" ];
+
       preStart = ''
         echo "auth = \"${bitcoind.rpc.users.public.name}:$(cat ${secretsDir}/bitcoin-rpcpassword-public)\"" \
           > fedimint-gateway.toml
+        macaroonDir=/var/lib/minimint/ln
+        mkdir -p $macaroonDir
       '';
+
+
+
       serviceConfig = nbLib.defaultHardening // {
       WorkingDirectory = cfg.dataDir;
       ExecStart = ''
-        FM_LN_DIR=/var/lib/minimint
-        FM_CFG_DIR=/var/lib/minimint
-        lightningd --network regtest --bitcoin-rpcuser=bitcoin --bitcoin-rpcpassword=bitcoin --lightning-dir=$FM_LN_DIR --addr=127.0.0.1: --plugin=ln_gateway --minimint-cfg=$FM_CFG_DIR
+        lightningd --network regtest --bitcoin-rpcuser=root --bitcoin-rpcpassword= --lightning-dir=/var/lib/minimint --addr=127.0.0.1:9736 --plugin=ln_gateway --minimint-cfg=/var/lib/minimint/client.json
       '';
       User = cfg.user;
       Group = cfg.group;
