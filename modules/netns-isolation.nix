@@ -297,14 +297,15 @@ in {
         id = 31;
         connections = [ "bitcoind" ];
       };
-       minimint = {
+      minimint = {
         id = 32;
         connections = [ "bitcoind" ];
       };
       fedimint-gateway = {
         id = 33;
       };
-      
+    };
+
     services.bitcoind = {
       address = netns.bitcoind.address;
       rpc.address = netns.bitcoind.address;
@@ -363,6 +364,7 @@ in {
     services.clightning-rest.address = netns.clightning-rest.address;
 
     services.minimint.address = netns.minimint.address;
+
   }
   ]);
 }
