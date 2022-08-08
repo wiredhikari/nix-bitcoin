@@ -13,37 +13,28 @@ let
     address = mkOption {
       type = types.str;
       default = "127.0.0.1";
-      description = "Address to listen for RPC connections.";
+      description = "Webserver address";
     };
     port = mkOption {
       type = types.port;
-      default = 5001;
-      description = "Port to listen for RPC connections.";
+      default = 8080;
+      description = "Webserver port";
     };
-    dataDir = mkOption {
+    minimintCfg = mkOption {
       type = types.path;
-      default = "/var/lib/fedimint-gateway";
-      description = "The data directory for fedimint-gateway.";
+      default = "/var/lib/minimint";
+      description = "The data directory for minimint.";
     };
     user = mkOption {
       type = types.str;
-      default = "fedimint-gateway";
+      default = "clightning";
       description = "The user as which to run fedimint-gateway.";
     };
     group = mkOption {
       type = types.str;
-      default = cfg.user;
+      default = "clightning";
       description = "The group as which to run fedimint-gateway.";
     };
-    nodes = {
-      clightning = {
-        enable = mkOption {
-          type = types.bool;
-          default = true;
-          description = "Enable the clightning node interface.";
-        };  
-      };
-    };  
     package = mkOption {
       type = types.package;
       default = config.nix-bitcoin.pkgs.minimint;
@@ -63,37 +54,14 @@ in {
   inherit options;
   config = mkIf cfg.enable {
     environment.systemPackages = [ cfg.package ];
-    services.bitcoind = {
-      enable = true;
-      txindex = true;
-    };
     services.clightning.enable = true;
-    systemd.services.fedimint-gateway = {
-      wantedBy = [ "multi-user.target" ];
-      requires = [ "minimint.service" "clightning.service" ];
-      after = [ "minimint.service" "clightning.service" ];
-      preStart = ''
-        echo "auth = \"${bitcoind.rpc.users.public.name}:$(cat ${secretsDir}/bitcoin-rpcpassword-public)\"" \
-          > fedimint-gateway.toml
-      '';
-      serviceConfig = nbLib.defaultHardening // {
-      WorkingDirectory = cfg.dataDir;
-      ExecStart = ''
-        FM_LN_DIR=/var/lib/minimint
-        FM_CFG_DIR=/var/lib/minimint
-        lightningd --network regtest --bitcoin-rpcuser=bitcoin --bitcoin-rpcpassword=bitcoin --lightning-dir=$FM_LN_DIR --addr=127.0.0.1: --plugin=ln_gateway --minimint-cfg=$FM_CFG_DIR
-      '';
-      User = cfg.user;
-      Group = cfg.group;
-      Restart = "on-failure";
-      RestartSec = "10s";
-      ReadWritePaths = cfg.dataDir;
-      };
-    };
+    services.clightning.extraConfig = ''
+      plugin=${config.nix-bitcoin.pkgs.minimint}/bin/ln_gateway
+      minimint-cfg=${cfg.minimintCfg}
+    '';
     users.users.${cfg.user} = {
       isSystemUser = true;
       group = cfg.group;
-      extraGroups = [ "bitcoinrpc-public" ];
     };
     users.groups.${cfg.group} = {};
     nix-bitcoin.operator.groups = [ cfg.group ];

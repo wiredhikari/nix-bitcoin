@@ -45,7 +45,7 @@ in {
       doas.extraConfig = mkIf config.security.doas.enable ''
         ${lib.concatMapStrings (user: "permit nopass ${cfg.name} as ${user}\n") cfg.allowRunAsUsers}
       '';
-      sudo.extraConfig = mkIf (!config.security.sudo.enable) ''
+      sudo.extraConfig = mkIf (!config.security.doas.enable) ''
         ${cfg.name} ALL=(${builtins.concatStringsSep "," cfg.allowRunAsUsers}) NOPASSWD: ALL
       '';
     };
