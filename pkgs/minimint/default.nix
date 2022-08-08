@@ -1,9 +1,9 @@
-{ stdenv, lib, rustPlatform, fetchurl, pkgs, fetchFromGitHub, openssl, pkg-config, perl, clang }:
+{ stdenv, lib, rustPlatform, fetchurl, pkgs, fetchFromGitHub, openssl, pkg-config, perl, clang, jq }:
 
 rustPlatform.buildRustPackage rec {
   pname = "minimint";
   version = "master";
-  nativeBuildInputs = [ pkg-config perl openssl clang ];
+  nativeBuildInputs = [ pkg-config perl openssl clang jq ];
   OPENSSL_DIR = "${pkgs.openssl.dev}";
   OPENSSL_LIB_DIR = "${pkgs.openssl.out}/lib";  
   LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
