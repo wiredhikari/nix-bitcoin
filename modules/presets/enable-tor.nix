@@ -34,7 +34,7 @@ in {
     # but we restrict them to Tor just to be safe.
     #
     electrs = defaultEnforceTor;
-    # minimint = defaultEnforceTor;
+    fulcrum = defaultEnforceTor;
     nbxplorer = defaultEnforceTor;
     rtl = defaultEnforceTor;
     joinmarket = defaultEnforceTor;
@@ -47,6 +47,7 @@ in {
     bitcoind.enable = defaultTrue;
     liquidd.enable = defaultTrue;
     electrs.enable = defaultTrue;
+    fulcrum.enable = defaultTrue;
     spark-wallet.enable = defaultTrue;
     joinmarket-ob-watcher.enable = defaultTrue;
     minimint.enable = defaultTrue;

@@ -293,15 +293,18 @@ in {
       clightning-rest = {
         id = 30;
       };
-      minimint = {
+      fulcrum = {
         id = 31;
         connections = [ "bitcoind" ];
       };
-      fedimint-gateway = {
+       minimint = {
         id = 32;
+        connections = [ "bitcoind" ];
       };
-    };
-
+      fedimint-gateway = {
+        id = 33;
+      };
+      
     services.bitcoind = {
       address = netns.bitcoind.address;
       rpc.address = netns.bitcoind.address;
@@ -310,7 +313,6 @@ in {
         netns.bitcoind.address
       ] ++ map (n: netns.${n}.address) netns.bitcoind.availableNetns;
     };
-    systemd.services.bitcoind-import-banlist.serviceConfig.NetworkNamespacePath = "/var/run/netns/nb-bitcoind";
 
     services.clightning.address = netns.clightning.address;
 
@@ -330,6 +332,8 @@ in {
     };
 
     services.electrs.address = netns.electrs.address;
+
+    services.fulcrum.address = netns.fulcrum.address;
 
     services.spark-wallet = {
       address = netns.spark-wallet.address;

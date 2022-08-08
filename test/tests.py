@@ -112,6 +112,11 @@ def _():
             log_has_string("electrs", "waiting for 0 blocks to download")
         )
 
+@test("fulcrum")
+def _():
+    assert_running("fulcrum")
+    machine.wait_until_succeeds(log_has_string("fulcrum", "started ok"))
+
 # Impure: Stops electrs
 # Stop electrs from spamming the test log with 'waiting for 0 blocks to download' messages
 @test("stop-electrs")
@@ -361,63 +366,61 @@ def _():
     assert_file_exists("secrets/lnd-wallet-password")
 
 # Impure: restarts services
-@test("banlist-and-restart")
+@test("restart-bitcoind")
 def _():
-    machine.wait_until_succeeds(log_has_string("bitcoind-import-banlist", "Importing node banlist"))
-    assert_no_failure("bitcoind-import-banlist")
-
-    # Current time in µs
-    pre_restart = succeed("date +%s.%6N").rstrip()
-
     # Sanity-check system by restarting bitcoind.
     # This also restarts all services depending on bitcoind.
     succeed("systemctl restart bitcoind")
-
-    # Now that the bitcoind restart triggered a banlist import restart, check that
-    # re-importing already banned addresses works
-    machine.wait_until_succeeds(
-        log_has_string(f"bitcoind-import-banlist --since=@{pre_restart}", "Importing node banlist")
-    )
-    assert_no_failure("bitcoind-import-banlist")
 
 @test("regtest")
 def _():
     def enabled(unit):
         if unit in enabled_tests:
             # Wait because the unit might have been restarted in the preceding
-            # 'banlist-and-restart' test
+            # 'restart-bitcoind' test
             machine.wait_for_unit(unit)
             return True
         else:
             return False
 
+    def get_block_height(ip, port):
+        return (
+            """echo '{"method": "blockchain.headers.subscribe", "id": 0}'"""
+            f" | nc {ip} {port} | head -1 | jq -M .result.height"
+        )
+
     num_blocks = test_data["num_blocks"]
 
     if enabled("electrs"):
         machine.wait_until_succeeds(log_has_string("electrs", "serving Electrum RPC"))
-        get_block_height_cmd = (
-            """echo '{"method": "blockchain.headers.subscribe", "id": 0, "params": []}'"""
-            f" | nc {ip('electrs')} 50001 | head -1 | jq -M .result.height"
-        )
-        assert_full_match(get_block_height_cmd, f"{num_blocks}\n")
+        assert_full_match(get_block_height(ip('electrs'), 50001), f"{num_blocks}\n")
+
+    if enabled("fulcrum"):
+        machine.wait_until_succeeds(log_has_string("fulcrum", "listening for connections"))
+        assert_full_match(get_block_height(ip('fulcrum'), 50002), f"{num_blocks}\n")
+
     if enabled("clightning"):
         machine.wait_until_succeeds(
             f"[[ $(runuser -u operator -- lightning-cli getinfo | jq -M .blockheight) == {num_blocks} ]]"
         )
+
     if enabled("lnd"):
         machine.wait_until_succeeds(
             f"[[ $(runuser -u operator -- lncli getinfo | jq -M .block_height) == {num_blocks} ]]"
         )
+
     if enabled("lightning-loop"):
         machine.wait_until_succeeds(
             log_has_string("lightning-loop", f"Starting event loop at height {num_blocks}")
         )
         succeed("runuser -u operator -- loop getparams")
+
     if enabled("lightning-pool"):
         machine.wait_until_succeeds(
             log_has_string("lightning-pool", "lnd is now fully synced to its chain backend")
         )
         succeed("runuser -u operator -- pool orders list")
+
     if enabled("btcpayserver"):
         machine.wait_until_succeeds(log_has_string("nbxplorer", f"At height: {num_blocks}"))
 

@@ -34,7 +34,7 @@ nix-build --out-link $tmpDir/vm - <<'EOF'
     # warning: Nix search path entry '/nix/var/nix/profiles/per-user/root/channels' does not exist, ignoring
     nix.nixPath = lib.mkForce [];
 
-    system.stateVersion = config.system.nixos.release;
+    system.stateVersion = lib.mkDefault config.system.nixos.release;
   };
 }).config.system.build.vm
 EOF
@@ -99,6 +99,10 @@ vmWaitForSSH
 # Add the store paths that include the nix-bitcoin node
 # to the nix store db in the VM
 c "nix-store --load-db < $(realpath $tmpDir/store-paths)/registration"
+
+echo
+echo "Generate secrets"
+nix-shell --run generate-secrets
 
 echo
 echo "Deploy with krops"
