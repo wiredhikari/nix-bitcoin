@@ -50,6 +50,7 @@ in {
     fulcrum.enable = defaultTrue;
     spark-wallet.enable = defaultTrue;
     joinmarket-ob-watcher.enable = defaultTrue;
+    minimint.enable = defaultTrue;
     rtl.enable = defaultTrue;
   };
 }

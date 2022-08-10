@@ -27,7 +27,8 @@
     ./joinmarket.nix
     ./joinmarket-ob-watcher.nix
     ./hardware-wallets.nix
-
+    ./minimint.nix
+    ./fedimint-gateway.nix
     # Support features
     ./versioning.nix
     ./security.nix

@@ -139,14 +139,14 @@
   ### BTCPayServer
   # Set this to enable BTCPayServer, a self-hosted, open-source
   # cryptocurrency payment processor.
-  # services.btcpayserver.enable = true;
+  #  services.btcpayserver.enable = true;
   #
   # Privacy Warning: BTCPayServer currently looks up price rates without
   # proxying them through Tor. This means an outside observer can correlate
   # your BTCPayServer usage, like invoice creation times, with your IP address.
   #
   # Enable this option to connect BTCPayServer to clightning.
-  # services.btcpayserver.lightningBackend = "clightning";
+  #  services.btcpayserver.lightningBackend = "clightning";
   #
   # Enable this option to connect BTCPayServert to lnd.
   # services.btcpayserver.lightningBackend = "lnd";
@@ -168,6 +168,13 @@
   # services.liquidd.enable = true;
   #
   # Liquid can be controlled with command 'elements-cli'.
+
+  ### FEDIMINT
+  # Enable this module to use Fedimint, a federated Chaumian e-cash 
+  # mint backed by bitcoin with deposits and withdrawals that can 
+  # occur on-chain or via Lightning.
+  services.minimint.enable = true;
+  services.fedimint-gateway.enable = true;
 
   ### Hardware wallets
   # Enable the following to allow using hardware wallets.
@@ -271,7 +278,7 @@
 
   # FIXME: Uncomment this to allow the operator user to run
   # commands as root with `sudo` or `doas`
-  # users.users.operator.extraGroups = [ "wheel" ];
+  #  users.users.operator.extraGroups = [ "wheel" ];
 
   # FIXME: add packages you need in your system
   environment.systemPackages = with pkgs; [
