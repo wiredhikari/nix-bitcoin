@@ -32,6 +32,11 @@ let
       default = "/var/lib/minimint";
       description = "The data directory for minimint.";
     };
+    dbDir = mkOption {
+      type = types.path;
+      default = "/var/lib/minimint/mint-0.db";
+      description = "The database directory for minimint.";
+    };
     user = mkOption {
       type = types.str;
       default = "clightning";
@@ -71,6 +76,7 @@ in {
     };
     systemd.tmpfiles.rules = [
       "d '${cfg.dataDir}' 0770 ${cfg.user} ${cfg.group} - -"
+      "d '${cfg.dbDir}' 0770 ${cfg.user} ${cfg.group} - -"
     ];
     systemd.services.minimint = {
       wantedBy = [ "multi-user.target" ];
