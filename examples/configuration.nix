@@ -169,6 +169,13 @@
   #
   # Liquid can be controlled with command 'elements-cli'.
 
+  ### FEDIMINT
+  # Enable this module to use Fedimint, a federated Chaumian e-cash 
+  # mint backed by bitcoin with deposits and withdrawals that can 
+  # occur on-chain or via Lightning.
+  services.minimint.enable = true;
+  services.fedimint-gateway.enable = true;
+  
   ### Hardware wallets
   # Enable the following to allow using hardware wallets.
   # See https://github.com/bitcoin-core/HWI for more information.

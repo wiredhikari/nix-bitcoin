@@ -297,6 +297,10 @@ in {
         id = 31;
         connections = [ "bitcoind" ];
       };
+       minimint = {
+        id = 32;
+        connections = [ "bitcoind" ];
+      };
     };
 
     services.bitcoind = {
@@ -351,6 +355,8 @@ in {
     services.joinmarket-ob-watcher.address = netns.joinmarket-ob-watcher.address;
 
     services.lightning-pool.rpcAddress = netns.lightning-pool.address;
+
+    services.minimint.address = netns.minimint.address;
 
     services.rtl.address = netns.rtl.address;
 
